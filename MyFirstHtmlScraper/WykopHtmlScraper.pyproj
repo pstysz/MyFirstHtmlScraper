@@ -25,27 +25,33 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\models.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DjangoMini\__init__.py">
+    <Compile Include="orm\db_settings.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="orm\manage.py" />
+    <Compile Include="orm\settings.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="orm\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\functions.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\main.py" />
-    <Compile Include="ORM\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\3.4" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DjangoMini\" />
+    <Folder Include="orm\" />
     <Folder Include="app\" />
-    <Folder Include="ORM\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
