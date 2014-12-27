@@ -31,9 +31,6 @@
     <Compile Include="app\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="orm\db_settings.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="orm\manage.py" />
     <Compile Include="orm\settings.py">
       <SubType>Code</SubType>
@@ -52,6 +49,9 @@
   <ItemGroup>
     <Folder Include="orm\" />
     <Folder Include="app\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app\db.sqlite3" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
