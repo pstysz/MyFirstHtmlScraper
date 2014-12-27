@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "MyFirstHtmlScraper", "MyFirstHtmlScraper\MyFirstHtmlScraper.pyproj", "{C8F4B8D9-C248-4E65-BBD8-AA664DC26C52}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "WykopHtmlScraper", "MyFirstHtmlScraper\WykopHtmlScraper.pyproj", "{C8F4B8D9-C248-4E65-BBD8-AA664DC26C52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
