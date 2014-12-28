@@ -3,7 +3,10 @@ import bs4
 import time
 import logging
 import os
-from models import Category, Post
+import sys
+sys.path.append('../orm/')
+sys.path.append('.')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
 from functions import *
 
 #region Configuration
@@ -13,7 +16,7 @@ from functions import *
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 root_url = 'http://www.wykop.pl/'
 site_pattern = root_url + 'strona/{{site_number}}/' #{{site_number}} is taken from last site number
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
+
 #endregion Configuration
 
 #region Initialization
@@ -31,6 +34,4 @@ for site_number in range(1, no_of_sites + 1):
     url = site_pattern.replace('{{site_number}}', str(site_number))
     soup = get_soup_for_url(url)
     posts = get_posts_from_soup(soup)
-
-
     print(posts)
