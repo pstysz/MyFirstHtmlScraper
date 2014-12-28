@@ -5,10 +5,13 @@ import bs4
 from multiprocessing import pool
 import re
 import sys
+from app.models import Post
 
 def get_soup_for_url(url):
     try:
+        logging.info('Getting response for {0}...'.format(url))
         response = requests.get(url)
+        logging.info('Generating soup for {0}...'.format(url))
         soup = bs4.BeautifulSoup(response.text)
         return soup
     except requests.exceptions.RequestException as e: 
@@ -19,21 +22,40 @@ def get_soup_for_url(url):
 def get_last_site_number(soup):
     try:
         #gets last site number from footer
+        logging.info('Getting last site number')
         page_number = soup.select('div.pager > p > a')[-2].get_text()
         return int(page_number)
     except:  
         #TODO: Implement some nice exception handling
         raise 
 
-def get_links(soup):
+def get_links_from_soup(soup):
     try:
         #gets links for all subsites in soup
+        logging.info('Getting links for subsites')
         return [link.attrs.get('href') for link in soup.select('div.article div.lcontrast h2 a')]
     except:  
         #TODO: Implement some nice exception handling
         raise 
 
+def get_posts_from_soup(soup):
+    try:
+        #gets links for all subsites in soup
+        logging.info('Getting posts from soup')
+        posts = []
+        for p in soup.select('div.article'):
+            post = Post()
+            post.id = p.attrs.get('data-id')
+            lcontrast = p.select('div.lcontrast')
+            post.title = lcontrast.select('h2 a').get_text()
+            post.url = lcontrast.select('h2 a').attrs.get('href')
+            post.description = lcontrast.select('div.description p a').get_text()
+            posts.append(post)
 
+        return posts
+    except:  
+        #TODO: Implement some nice exception handling
+        raise 
 
 
 def get_video_page_urls(index_url):
