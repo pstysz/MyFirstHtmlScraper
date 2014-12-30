@@ -1,18 +1,19 @@
-
+# -*- coding: utf-8 -*-
 import requests
 import logging
 import bs4
 from multiprocessing import pool
 import re
 import sys
-from app.models import Post
+from app.models import Post, Category
+from dateutil.parser import parse
 
 def get_soup_for_url(url):
     try:
         logging.info('Getting response for {0}...'.format(url))
         response = requests.get(url)
         logging.info('Generating soup for {0}...'.format(url))
-        soup = bs4.BeautifulSoup(response.text)
+        soup = bs4.BeautifulSoup(response.text, "html5lib")
         return soup
     except requests.exceptions.RequestException as e: 
         print(e)
@@ -43,57 +44,50 @@ def get_posts_from_soup(soup):
         #gets links for all subsites in soup
         logging.info('Getting posts from soup')
         posts = []
-        for p in soup.select('div.article'):
-            post = Post()
-            post.id = p.attrs.get('data-id')
-            #FIXME: lcontrast is a list, not a soup
-            lcontrast = p.select('div.lcontrast')
-            post.title = lcontrast.select('h2 a')[0].get_text()
-            post.url = lcontrast.select('h2 a')[0].attrs.get('href')
-            post.description = lcontrast.select('div.description p a')[0].get_text()
-            posts.append(post)
 
-        return posts
+        for article in soup.select('ul#itemsStream div.article'):
+            temp_id = article.attrs.get('data-id')
+            temp_popularity = article.select('div.diggbox span')[0].get_text().strip()
+
+            if (not temp_popularity.isdigit()) or (temp_id is None):
+                continue # popularity is not number for ad posts
+
+            temp_popularity = int(temp_popularity)
+
+            #check if post already exist in db and update popularity or insert new post
+            if Post.objects.filter(pk=temp_id).exists():
+                #post with selected id already exists == only update popularity
+                post = Post.objects.get(pk=temp_id)
+
+                if post.popularity != temp_popularity:
+                    post.popularity = temp_popularity
+                    post.save()
+            else:
+                #post with selected id doesnt exist yet == create new post
+                post = Post()
+                post.id = temp_id
+                post.popularity = temp_popularity
+                post.title = article.select('div.lcontrast h2 a')[0].get_text().strip()
+                post.url = article.select('div.lcontrast h2 a')[0].attrs.get('href').strip()
+                post.description = article.select('div.lcontrast div.description p a')[0].get_text().strip()
+                post.image_url = article.select('div.media-content img')[0].attrs.get('src')
+                post.date = parse(article.select('div.lcontrast div.row span.affect time')[0].attrs.get('datetime'))
+                tags = [a.attrs.get('href').split('/')[-2] for a in article.select('a.tag') if not a.attrs.get('href') is None]
+                categories = []
+
+                for tag in tags:
+                    (new_category, isCreated) = Category.objects.get_or_create(name=tag)
+                    categories.append(new_category)
+
+                if len(categories) > 0:
+                    # add many-to-many relation between created post and categories
+                    post.save()
+                    post.category.add(*categories)
+                posts.append(post)
+        
+        if len(posts) > 0:
+            Post.objects.bulk_create(posts) #insert on database
+
     except:  
         #TODO: Implement some nice exception handling
         raise 
-
-
-# EXAMPLES
-
-#def get_video_page_urls(index_url):
-#    logging.info('Getting requests.response...')
-#    response = requests.get(index_url)
-#    logging.info('Getting soup...')
-#    soup = bs4.BeautifulSoup(response.text)
-#    logging.info('Getting links...')
-#    return [('http://pyvideo.org' + a.attrs.get('href')) for a in soup.select('div.video-summary-data a[href^=/video]')]
-
-#def get_video_data(video_page_url):
-#    video_data = {}
-#    response = requests.get(video_page_url)
-#    soup = bs4.BeautifulSoup(response.text)
-#    video_data['title'] = soup.select('div#videobox h3')[0].get_text()
-#    video_data['speakers'] = [a.get_text() for a in soup.select('div#sidebar a[href^=/speaker]')]
- 
-#    # initialize counters
-#    video_data['views'] = 0
-#    video_data['likes'] = 0
-#    video_data['dislikes'] = 0
- 
-#    try:
-#        video_data['youtube_url'] = soup.select('div#sidebar a[href^=http://www.youtube.com]')[0].get_text()
-#        response = requests.get(video_data['youtube_url'], headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.77 Safari/537.36'})
-#        soup = bs4.BeautifulSoup(response.text)
-#        video_data['views'] = int(re.sub('[^0-9]', '', soup.select('.watch-view-count')[0].get_text().split()[0]))
-#        video_data['likes'] = int(re.sub('[^0-9]', '', soup.select('#watch-like-dislike-buttons span.yt-uix-button-content')[0].get_text().split()[0]))
-#        video_data['dislikes'] = int(re.sub('[^0-9]', '', soup.select('#watch-like-dislike-buttons span.yt-uix-button-content')[2].get_text().split()[0]))
-#    except:
-#        # some or all of the counters could not be scraped
-#        pass
-#    return video_data
-
-#def show_video_stats(index_url):
-#    video_page_urls = get_video_page_urls(index_url)
-#    for video_page_url in video_page_urls:
-#        print(get_video_data(video_page_url))

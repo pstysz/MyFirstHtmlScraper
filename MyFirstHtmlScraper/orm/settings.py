@@ -1,4 +1,4 @@
-#Fake settings.py; this file need to exist to use Django ORM
+# -*- coding: utf-8 -*-
 from django.conf import settings
 import os
 import app
