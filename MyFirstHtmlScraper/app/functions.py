@@ -39,7 +39,7 @@ def get_links_from_soup(soup):
         #TODO: Implement some nice exception handling
         raise 
 
-def get_posts_from_soup(soup):
+def create_posts_from_soup(soup):
     try:
         #gets links for all subsites in soup
         logging.info('Getting posts from soup')
@@ -47,6 +47,7 @@ def get_posts_from_soup(soup):
 
         for article in soup.select('ul#itemsStream div.article'):
             temp_id = article.attrs.get('data-id')
+            logging.info('Getting posts id = {0}'.format(temp_id))
             temp_popularity = article.select('div.diggbox span')[0].get_text().strip()
 
             if (not temp_popularity.isdigit()) or (temp_id is None):

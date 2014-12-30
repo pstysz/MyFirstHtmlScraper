@@ -11,10 +11,26 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Test',
+            name='Category',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
-                ('field', models.CharField(max_length=255)),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('name', models.CharField(max_length=50, unique=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Post',
+            fields=[
+                ('id', models.PositiveIntegerField(primary_key=True, serialize=False)),
+                ('title', models.CharField(max_length=100)),
+                ('description', models.TextField(max_length=500)),
+                ('url', models.URLField(null=True, blank=True)),
+                ('popularity', models.IntegerField(null=True, blank=True)),
+                ('image_url', models.URLField(null=True, blank=True)),
+                ('date', models.DateField(null=True, blank=True)),
+                ('category', models.ManyToManyField(to='app.Category')),
             ],
             options={
             },

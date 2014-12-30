@@ -36,6 +36,6 @@ scraped_posts = Post.objects.all()
 for site_number in range(1, no_of_sites + 1):
     url = site_pattern.replace('{{site_number}}', str(site_number))
     soup = get_soup_for_url(url)
-    posts = get_posts_from_soup(soup)
+    create_posts_from_soup(soup)
 
     print(sys.stdout.encoding)
