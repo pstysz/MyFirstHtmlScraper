@@ -19,7 +19,6 @@ def get_soup_for_url(url):
         print(e)
         sys.exit(1)
 
-
 def get_last_site_number(soup):
     try:
         #gets last site number from footer
@@ -89,3 +88,10 @@ def create_posts_from_soup(soup):
     except:  
         #TODO: Implement some nice exception handling
         raise 
+
+def scrap_sites(no_of_sites, site_pattern):
+    for site_number in range(1, no_of_sites + 1):
+        logging.info('Start scapring for page {0}'.format(site_number))
+        url = site_pattern.replace('{{site_number}}', str(site_number))
+        soup = get_soup_for_url(url)
+        create_posts_from_soup(soup)

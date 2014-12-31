@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import requests
-import bs4
-import time
 import logging
 import os
 import sys
@@ -26,13 +23,8 @@ django.setup()
 
 base_soup = get_soup_for_url(root_url)
 
-no_of_sites = 1 # get_last_site_number(base_soup)
+no_of_sites = get_last_site_number(base_soup)
 
 #endregion Initialization
 
-
-for site_number in range(1, no_of_sites + 1):
-    logging.info('Start scapring for page {0}'.format(site_number))
-    url = site_pattern.replace('{{site_number}}', str(site_number))
-    soup = get_soup_for_url(url)
-    create_posts_from_soup(soup)
+scrap_sites(no_of_sites, site_pattern)
