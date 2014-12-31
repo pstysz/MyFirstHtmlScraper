@@ -5,6 +5,10 @@ import bs4
 from multiprocessing import pool
 import re
 import sys
+import os
+sys.path.append('../orm/')
+sys.path.append('.')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
 from app.models import Post, Category
 from dateutil.parser import parse
 
@@ -97,3 +101,19 @@ def scrap_sites(no_of_sites, site_pattern):
         url = site_pattern.replace('{{site_number}}', str(site_number))
         soup = get_soup_for_url(url)
         create_posts_from_soup(soup)
+
+def get_key_words(input_string, no_of_key_words):
+    ''' Returns most common words from passed string'''
+    cleared_string = [word[:-1] for word in re.sub(r'[^\w ]|[\d]', '', input_string).lower().split(' ') if len(word[:-1]) > 2]
+    appearances = {}
+
+    for word in cleared_string:
+        if word in appearances:
+            appearances[word] += 1
+        else:
+            appearances[word] = 1
+    
+    if no_of_key_words > 0:
+        return sorted(appearances, key=appearances.get, reverse=True)[:no_of_key_words]
+
+    return []

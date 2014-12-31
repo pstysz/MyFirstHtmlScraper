@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-import os
-import sys
 import django
 import time
-sys.path.append('../orm/')
-sys.path.append('.')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
 from functions import *
 
 #region Configuration
@@ -27,6 +22,7 @@ base_soup = get_soup_for_url(root_url)
 no_of_sites = get_last_site_number(base_soup)
 
 #endregion Initialization
+
 logging.info('Found {0} sites to scrap'.format(no_of_sites))
 start_time = time.time()
 scrap_sites(no_of_sites, site_pattern)

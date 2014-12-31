@@ -8,6 +8,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        app_label = 'app'
+
 class Post(models.Model):
     id = models.PositiveIntegerField(primary_key=True) #id will be get from post id so autoincrementation is undesirable
     title = models .CharField(max_length=100)
@@ -20,3 +23,6 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        app_label = 'app'
