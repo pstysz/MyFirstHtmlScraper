@@ -69,6 +69,8 @@ def create_posts_from_soup(soup):
 
                 for tag in tags:
                     (new_category, isCreated) = Category.objects.get_or_create(name=tag)
+                    new_category.popularity += 1
+                    new_category.save()
                     categories.append(new_category)
 
                 if len(categories) > 0:

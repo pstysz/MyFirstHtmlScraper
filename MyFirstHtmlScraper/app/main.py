@@ -23,7 +23,7 @@ django.setup()
 
 base_soup = get_soup_for_url(root_url)
 
-no_of_sites = get_last_site_number(base_soup)
+no_of_sites = 1 # get_last_site_number(base_soup)
 
 #endregion Initialization
 
