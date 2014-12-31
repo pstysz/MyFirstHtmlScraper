@@ -30,12 +30,9 @@ no_of_sites = 1 # get_last_site_number(base_soup)
 
 #endregion Initialization
 
-scraped_posts = Post.objects.all()
-
 
 for site_number in range(1, no_of_sites + 1):
+    logging.info('Start scapring for page {0}'.format(site_number))
     url = site_pattern.replace('{{site_number}}', str(site_number))
     soup = get_soup_for_url(url)
     create_posts_from_soup(soup)
-
-    print(sys.stdout.encoding)

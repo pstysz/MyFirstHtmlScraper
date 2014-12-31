@@ -10,9 +10,9 @@ from dateutil.parser import parse
 
 def get_soup_for_url(url):
     try:
-        logging.info('Getting response for {0}...'.format(url))
+        logging.info('Getting response for {0}'.format(url))
         response = requests.get(url)
-        logging.info('Generating soup for {0}...'.format(url))
+        logging.info('Generating soup for {0}'.format(url))
         soup = bs4.BeautifulSoup(response.text, "html5lib")
         return soup
     except requests.exceptions.RequestException as e: 
@@ -30,15 +30,6 @@ def get_last_site_number(soup):
         #TODO: Implement some nice exception handling
         raise 
 
-def get_links_from_soup(soup):
-    try:
-        #gets links for all subsites in soup
-        logging.info('Getting links for subsites')
-        return [link.attrs.get('href') for link in soup.select('div.article div.lcontrast h2 a')]
-    except:  
-        #TODO: Implement some nice exception handling
-        raise 
-
 def create_posts_from_soup(soup):
     try:
         #gets links for all subsites in soup
@@ -51,7 +42,7 @@ def create_posts_from_soup(soup):
             temp_popularity = article.select('div.diggbox span')[0].get_text().strip()
 
             if (not temp_popularity.isdigit()) or (temp_id is None):
-                continue # popularity is not number for ad posts
+                continue #popularity is not number for ad posts
 
             temp_popularity = int(temp_popularity)
 
@@ -62,6 +53,7 @@ def create_posts_from_soup(soup):
 
                 if post.popularity != temp_popularity:
                     post.popularity = temp_popularity
+                    logging.info('Updating posts id = {0}'.format(temp_id))
                     post.save()
             else:
                 #post with selected id doesnt exist yet == create new post
@@ -71,7 +63,7 @@ def create_posts_from_soup(soup):
                 post.title = article.select('div.lcontrast h2 a')[0].get_text().strip()
                 post.url = article.select('div.lcontrast h2 a')[0].attrs.get('href').strip()
                 post.description = article.select('div.lcontrast div.description p a')[0].get_text().strip()
-                post.image_url = article.select('div.media-content img')[0].attrs.get('src')
+                post.image_url = article.select('div.media-content img')[0].attrs.get('data-original')
                 post.date = parse(article.select('div.lcontrast div.row span.affect time')[0].attrs.get('datetime'))
                 tags = [a.attrs.get('href').split('/')[-2] for a in article.select('a.tag') if not a.attrs.get('href') is None]
                 categories = []
@@ -82,12 +74,17 @@ def create_posts_from_soup(soup):
 
                 if len(categories) > 0:
                     # add many-to-many relation between created post and categories
+                    logging.info('Creating posts id = {0}'.format(temp_id))
                     post.save()
                     post.category.add(*categories)
-                posts.append(post)
+                    logging.info('Adding {0} categories posts id = {1}'.format(len(categories), temp_id))
+                    post.save()
+                else:
+                    posts.append(post)
         
         if len(posts) > 0:
-            Post.objects.bulk_create(posts) #insert on database
+            logging.info('Bulk create {0} posts'.format(len(posts)))
+            Post.objects.bulk_create(posts) #insert on database if not saved before
 
     except:  
         #TODO: Implement some nice exception handling
