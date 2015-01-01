@@ -2,7 +2,7 @@
 import logging
 import django
 import time
-from functions import start_scraping_digger
+from digger_functions import start_scraping_digger
 
 #region Configuration
 

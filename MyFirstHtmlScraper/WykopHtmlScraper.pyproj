@@ -25,6 +25,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\global_functions.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\models.py">
       <SubType>Code</SubType>
     </Compile>
@@ -41,7 +44,7 @@
     <Compile Include="orm\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\functions.py">
+    <Compile Include="app\digger_functions.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\main.py" />
