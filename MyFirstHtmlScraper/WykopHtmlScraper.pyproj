@@ -31,6 +31,10 @@
     <Compile Include="app\global_functions.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="app\migrations\0001_initial.py" />
+    <Compile Include="app\migrations\0002_category_popularity.py" />
+    <Compile Include="app\migrations\0003_auto_20150101_1922.py" />
+    <Compile Include="app\migrations\__init__.py" />
     <Compile Include="app\models.py">
       <SubType>Code</SubType>
     </Compile>
@@ -56,6 +60,7 @@
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\3.4" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="app\migrations\" />
     <Folder Include="orm\" />
     <Folder Include="app\" />
   </ItemGroup>

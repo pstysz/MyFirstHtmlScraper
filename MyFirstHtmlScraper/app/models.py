@@ -20,6 +20,7 @@ class Post(models.Model):
     popularity = models.IntegerField(null=True, blank=True) # count of 'wykopy'
     image_url = models.URLField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
+    use_count = models.IntegerField(default=0) # how many times this post was publicated on web
     category = models.ManyToManyField(Category)
 
     def __str__(self):
@@ -32,6 +33,7 @@ class Content(models.Model):
     text = models.TextField()
     text_length = models.IntegerField(default=0)
     category = models.ManyToManyField(Category)
+    use_count = models.IntegerField(default=0) # how many times this text was publicated on web
 
     def save(self, *args, **kwargs):
         self.text_length = len(self.text)
