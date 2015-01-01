@@ -2,7 +2,7 @@
 import requests
 import logging
 import bs4
-from multiprocessing import pool
+import multiprocessing
 import re
 import sys
 import os
@@ -11,6 +11,22 @@ sys.path.append('.')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
 from app.models import Post, Category
 from dateutil.parser import parse
+
+lock = None
+def initialize_lock(l):
+   global lock
+   lock = l
+
+def start_scraping_digger(base_url, site_pattern):
+    base_soup = get_soup_for_url(base_url)
+    no_of_sites = get_last_site_number(base_soup)
+    urls = get_urls_from_pattern(no_of_sites, site_pattern)
+    no_of_pools = multiprocessing.cpu_count() * 2
+    lock = multiprocessing.Lock()
+    pool = multiprocessing.Pool(no_of_pools, initializer=initialize_lock, initargs=(lock,))
+    pool.map_async(scrap_site, urls)
+    pool.close()
+    pool.join()
 
 def get_soup_for_url(url):
     try:
@@ -52,13 +68,18 @@ def create_posts_from_soup(soup):
             temp_popularity = int(temp_popularity)
 
             #check if post already exist in db and update popularity or insert new post
-            if Post.objects.filter(pk=temp_id).exists():
+            lock.acquire()
+            post_exist = Post.objects.filter(pk=temp_id).exists()
+            lock.release()
+            if post_exist:
                 #post with selected id already exists == only update popularity
+                lock.acquire()
                 post = Post.objects.get(pk=temp_id)
                 if post.popularity != temp_popularity:
                     post.popularity = temp_popularity
                     logging.info('Updating posts id = {0}'.format(temp_id))
                     post.save()
+                lock.release()
             else:
                 #post with selected id doesnt exist yet == create new post
                 post = Post()
@@ -75,34 +96,44 @@ def create_posts_from_soup(soup):
                 tags = [a.attrs.get('href').split('/')[-2] for a in article.select('a.tag') if not a.attrs.get('href') is None]
                 categories = []
                 for tag in tags:
+                    lock.acquire()
                     (new_category, isCreated) = Category.objects.get_or_create(name=tag)
                     new_category.popularity += 1
                     new_category.save()
+                    lock.release()
                     categories.append(new_category)
                 if len(categories) > 0:
                     # add many-to-many relation between created post and categories
                     logging.info('Creating posts id = {0}'.format(temp_id))
+                    lock.acquire()
                     post.save()
                     post.category.add(*categories)
                     logging.info('Adding {0} categories posts id = {1}'.format(len(categories), temp_id))
                     post.save()
+                    lock.release()
                 else:
-                    posts.append(post)
-        
+                    posts.append(post)   
         if len(posts) > 0:
             logging.info('Bulk create {0} posts'.format(len(posts)))
+            lock.acquire()
             Post.objects.bulk_create(posts) #insert on database if not saved before
+            lock.release()
 
     except:  
         #TODO: Implement some nice exception handling
         raise 
 
-def scrap_sites(no_of_sites, site_pattern):
-    for site_number in range(1, no_of_sites + 1):
-        logging.info('Start scapring for page {0}'.format(site_number))
-        url = site_pattern.replace('{{site_number}}', str(site_number))
+def get_urls_from_pattern(no_of_sites, site_pattern):
+    return [site_pattern.replace('{{site_number}}', str(site_number)) for site_number in range(1, no_of_sites + 1)]
+
+def scrap_site(url):
+    try:
+        logging.info('Start scapring {0}'.format(url))
         soup = get_soup_for_url(url)
         create_posts_from_soup(soup)
+    except:
+        #TODO: Implement some nice exception handling
+        raise
 
 def get_key_words_from_text(input_string, no_of_key_words):
     ''' Returns most common words from passed string'''

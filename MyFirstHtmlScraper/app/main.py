@@ -2,7 +2,7 @@
 import logging
 import django
 import time
-from functions import *
+from functions import start_scraping_digger
 
 #region Configuration
 
@@ -15,15 +15,8 @@ django.setup()
 
 #endregion Configuration
 
-#region Initialization
 
-base_soup = get_soup_for_url(root_url)
-
-no_of_sites = get_last_site_number(base_soup)
-
-#endregion Initialization
-
-logging.info('Found {0} sites to scrap'.format(no_of_sites))
-start_time = time.time()
-scrap_sites(no_of_sites, site_pattern)
-logging.info('Scraping took {0}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))))
+if __name__ == '__main__':
+    start_time = time.time()
+    start_scraping_digger(root_url, site_pattern)
+    logging.info('Scraping took {0}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))))
