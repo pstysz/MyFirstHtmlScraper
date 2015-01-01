@@ -16,5 +16,6 @@ django.setup()
 
 if __name__ == '__main__':
     start_time = time.time()
-    start_scraping_digger()
+    #start_scraping_digger()
+
     logging.info('Scraping took {0}'.format(time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))))

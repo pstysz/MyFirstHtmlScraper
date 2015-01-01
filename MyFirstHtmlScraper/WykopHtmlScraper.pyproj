@@ -25,7 +25,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app\forbes_functions.py">
+    <Compile Include="app\wp_functions.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="app\global_functions.py">
