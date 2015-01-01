@@ -14,15 +14,17 @@ from dateutil.parser import parse
 from global_functions import get_urls_from_pattern
 
 lock = None # global variable to prevent database lock
+ROOT_URL = 'http://www.wykop.pl/wykopalisko/'
+SITE_PATTERN = ROOT_URL + 'strona/{{site_number}}/' #{{site_number}} is taken from last site number
 
 def initialize_lock(l):
    global lock
    lock = l
 
-def start_scraping_digger(base_url, site_pattern):
-    base_soup = get_soup_for_url(base_url)
+def start_scraping_digger():
+    base_soup = get_soup_for_url(ROOT_URL)
     no_of_sites = get_last_site_number(base_soup)
-    urls = get_urls_from_pattern(no_of_sites, site_pattern)
+    urls = get_urls_from_pattern(no_of_sites, SITE_PATTERN)
     no_of_pools = multiprocessing.cpu_count() * 2
     lock = multiprocessing.Lock()
     pool = multiprocessing.Pool(no_of_pools, initializer=initialize_lock, initargs=(lock,))

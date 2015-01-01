@@ -25,6 +25,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\forbes_functions.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\global_functions.py">
       <SubType>Code</SubType>
     </Compile>
