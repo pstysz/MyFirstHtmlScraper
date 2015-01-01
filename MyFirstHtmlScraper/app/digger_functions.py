@@ -103,6 +103,7 @@ def create_posts_from_soup(soup):
                     lock.acquire()
                     (new_category, isCreated) = Category.objects.get_or_create(name=tag)
                     new_category.popularity += 1
+                    new_category.appears_on_digger = True
                     new_category.save()
                     lock.release()
                     categories.append(new_category)
