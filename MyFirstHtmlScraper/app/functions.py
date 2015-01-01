@@ -17,7 +17,7 @@ def get_soup_for_url(url):
         logging.info('Getting response for {0}'.format(url))
         response = requests.get(url)
         logging.info('Generating soup for {0}'.format(url))
-        soup = bs4.BeautifulSoup(response.text, "html5lib")
+        soup = bs4.BeautifulSoup(response.text, "lxml")
         return soup
     except requests.exceptions.RequestException as e: 
         print(e)
@@ -40,20 +40,21 @@ def create_posts_from_soup(soup):
         posts = []
 
         for article in soup.select('ul#itemsStream div.article'):
+            temp_desc = article.select('div.lcontrast div.description p a')[0].get_text().strip()
+            if len(temp_desc) < 100:
+                continue #get only posts with text longer than 100 chars
+
             temp_id = article.attrs.get('data-id')
             logging.info('Getting posts id = {0}'.format(temp_id))
             temp_popularity = article.select('div.diggbox span')[0].get_text().strip()
-
             if (not temp_popularity.isdigit()) or (temp_id is None):
                 continue #popularity is not number for ad posts
-
             temp_popularity = int(temp_popularity)
 
             #check if post already exist in db and update popularity or insert new post
             if Post.objects.filter(pk=temp_id).exists():
                 #post with selected id already exists == only update popularity
                 post = Post.objects.get(pk=temp_id)
-
                 if post.popularity != temp_popularity:
                     post.popularity = temp_popularity
                     logging.info('Updating posts id = {0}'.format(temp_id))
@@ -67,16 +68,17 @@ def create_posts_from_soup(soup):
                 post.url = article.select('div.lcontrast h2 a')[0].attrs.get('href').strip()
                 post.description = article.select('div.lcontrast div.description p a')[0].get_text().strip()
                 post.image_url = article.select('div.media-content img')[0].attrs.get('data-original')
+                if post.image_url == '':
+                    post.image_url = article.select('div.media-content img')[0].attrs.get('src')
                 post.date = parse(article.select('div.lcontrast div.row span.affect time')[0].attrs.get('datetime'))
+
                 tags = [a.attrs.get('href').split('/')[-2] for a in article.select('a.tag') if not a.attrs.get('href') is None]
                 categories = []
-
                 for tag in tags:
                     (new_category, isCreated) = Category.objects.get_or_create(name=tag)
                     new_category.popularity += 1
                     new_category.save()
                     categories.append(new_category)
-
                 if len(categories) > 0:
                     # add many-to-many relation between created post and categories
                     logging.info('Creating posts id = {0}'.format(temp_id))
@@ -102,18 +104,16 @@ def scrap_sites(no_of_sites, site_pattern):
         soup = get_soup_for_url(url)
         create_posts_from_soup(soup)
 
-def get_key_words(input_string, no_of_key_words):
+def get_key_words_from_text(input_string, no_of_key_words):
     ''' Returns most common words from passed string'''
-    cleared_string = [word[:-1] for word in re.sub(r'[^\w ]|[\d]', '', input_string).lower().split(' ') if len(word[:-1]) > 2]
+    logging.info('Pulling out {0} keywords from passed string '.format(no_of_key_words))
+    cleared_string = [word[:-1] for word in re.sub(r'[^\w ]|[\d]', '', input_string).lower().split(' ') if len(word[:-2]) > 2]
     appearances = {}
-
     for word in cleared_string:
         if word in appearances:
             appearances[word] += 1
         else:
             appearances[word] = 1
-    
     if no_of_key_words > 0:
         return sorted(appearances, key=appearances.get, reverse=True)[:no_of_key_words]
-
     return []
