@@ -31,6 +31,7 @@
     <Compile Include="app\migrations\0004_auto_20150101_1948.py" />
     <Compile Include="app\migrations\0005_auto_20150101_2217.py" />
     <Compile Include="app\migrations\0006_auto_20150102_0920.py" />
+    <Compile Include="app\migrations\0007_sourcearticle.py" />
     <Compile Include="app\pclab_functions.py">
       <SubType>Code</SubType>
     </Compile>
