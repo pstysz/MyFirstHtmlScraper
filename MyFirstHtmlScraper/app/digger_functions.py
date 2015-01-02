@@ -13,21 +13,15 @@ from app.models import Post, Category
 from dateutil.parser import parse
 from global_functions import get_urls_from_pattern
 
-lock = None # global variable to prevent database lock
 ROOT_URL = 'http://www.wykop.pl/wykopalisko/'
 SITE_PATTERN = ROOT_URL + 'strona/{{site_number}}/' #{{site_number}} is taken from last site number
-
-def initialize_lock(l):
-   global lock
-   lock = l
 
 def start_scraping_digger():
     base_soup = get_soup_for_url(ROOT_URL)
     no_of_sites = get_last_site_number(base_soup)
     urls = get_urls_from_pattern(no_of_sites, SITE_PATTERN)
     no_of_pools = multiprocessing.cpu_count() * 2
-    lock = multiprocessing.Lock()
-    pool = multiprocessing.Pool(no_of_pools, initializer=initialize_lock, initargs=(lock,))
+    pool = multiprocessing.Pool(no_of_pools)
     pool.map_async(scrap_site, urls)
     pool.close()
     pool.join()
@@ -72,18 +66,13 @@ def create_posts_from_soup(soup):
             temp_popularity = int(temp_popularity)
 
             #check if post already exist in db and update popularity or insert new post
-            lock.acquire()
-            post_exist = Post.objects.filter(pk=temp_id).exists()
-            lock.release()
-            if post_exist:
+            if Post.objects.filter(pk=temp_id).exists():
                 #post with selected id already exists == only update popularity
-                lock.acquire()
                 post = Post.objects.get(pk=temp_id)
                 if post.popularity != temp_popularity:
                     post.popularity = temp_popularity
                     logging.info('Updating posts id = {0}'.format(temp_id))
                     post.save()
-                lock.release()
             else:
                 #post with selected id doesnt exist yet == create new post
                 post = Post()
@@ -100,29 +89,23 @@ def create_posts_from_soup(soup):
                 tags = [a.attrs.get('href').split('/')[-2] for a in article.select('a.tag') if not a.attrs.get('href') is None]
                 categories = []
                 for tag in tags:
-                    lock.acquire()
                     (new_category, isCreated) = Category.objects.get_or_create(name=tag)
                     new_category.popularity += 1
                     new_category.appears_on_digger = True
                     new_category.save()
-                    lock.release()
                     categories.append(new_category)
                 if len(categories) > 0:
                     # add many-to-many relation between created post and categories
                     logging.info('Creating posts id = {0}'.format(temp_id))
-                    lock.acquire()
                     post.save()
                     post.category.add(*categories)
                     logging.info('Adding {0} categories posts id = {1}'.format(len(categories), temp_id))
                     post.save()
-                    lock.release()
                 else:
                     posts.append(post)   
         if len(posts) > 0:
             logging.info('Bulk create {0} posts'.format(len(posts)))
-            lock.acquire()
             Post.objects.bulk_create(posts) #insert on database if not saved before
-            lock.release()
 
     except:  
         #TODO: Implement some nice exception handling
