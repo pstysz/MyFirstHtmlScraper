@@ -82,7 +82,7 @@ def create_posts_from_soup(soup):
                 post.url = article.select('div.lcontrast h2 a')[0].attrs.get('href').strip()
                 post.description = article.select('div.lcontrast div.description p a')[0].get_text().strip()
                 post.image_url = article.select('div.media-content img')[0].attrs.get('data-original')
-                if post.image_url == '':
+                if post.image_url is None:
                     post.image_url = article.select('div.media-content img')[0].attrs.get('src')
                 post.date = parse(article.select('div.lcontrast div.row span.affect time')[0].attrs.get('datetime'))
 
