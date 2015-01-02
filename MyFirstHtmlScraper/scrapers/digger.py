@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
 import multiprocessing
-from peewee_models import KickerPost, Category, KickerPostToCategory, db
+from models.digger import KickerPost, KickerPostToCategory
+from models.shared import Category, db
 from dateutil.parser import parse
-from global_functions import get_urls_from_pattern, get_soup_for_url
-from configuration import KICKER_ROOT_URL, KICKER_SUBSITE_PATTERN
+from common.helpers import get_urls_from_pattern, get_soup_for_url
+from configuration.settings import KICKER_ROOT_URL, KICKER_SUBSITE_PATTERN
 
 def start_scraping():
     base_soup = get_soup_for_url(KICKER_ROOT_URL)

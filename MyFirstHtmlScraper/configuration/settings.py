@@ -19,5 +19,7 @@ DBSETTINGS = {
 }
 
 KICKER_ROOT_URL = 'http://www.wykop.pl/wykopalisko/'
-
 KICKER_SUBSITE_PATTERN = KICKER_ROOT_URL + 'strona/{{site_number}}/' #{{site_number}} is taken from last site number
+
+PCLAB_SITE_PATTERN =  'http://pclab.pl/news-{{site_number}}-100.html' 
+PCLAB_ARTICLE_PATTERN = 'http://pclab.pl/news{{article_id}}.html'

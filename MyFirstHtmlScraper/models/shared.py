@@ -1,6 +1,31 @@
-from configuration.configuration import DBSETTINGS
+from configuration.settings import DBSETTINGS
 from peewee import *
+from models.digger import digger_models
 
+#db = SqliteDatabase(**DBSETTINGS['sqlite3'])
+db = MySQLDatabase(**DBSETTINGS['mysql'])
+
+models_to_create = []
+
+SOURCE_CHOICE = (
+    (0, 'unknown'),
+    (1, 'pclab'),
+)
+
+class BaseModel(Model):
+    '''Abstract class used to set parameters for every model'''
+    class Meta:
+        database = db
+
+class Category(BaseModel):
+    '''Categories binded to posts, content and articles'''
+    name = CharField(max_length=50, unique=True)
+    popularity_kicker = IntegerField(default=0)  # how often category appears on kicker site
+    popularity_pclab = IntegerField(default=0)  # how often category appears on pclab site
+    is_disabled = BooleanField(default=False)
+    def __str__(self):
+        return self.name
+models_to_create.append(Category)
 
 #class SourceArticle(Model):
 #    '''Article to extract content'''
@@ -12,7 +37,7 @@ from peewee import *
 #        return self.text
 #    class Meta:
 #        indexes = ((('source', 'source_id'), True),)
-#tables_to_create.append(SourceArticle)
+#models_to_create.append(SourceArticle)
 
 #class SourceArticleToCategory(BaseModel):
 #    '''Many-To-Many relation between SourceArticle and Categories'''
@@ -20,7 +45,7 @@ from peewee import *
 #    category = ForeignKeyField(Category)
 #    class Meta:
 #        indexes = ((('source_article', 'category'), True),)
-#tables_to_create.append(SourceArticleToCategory)
+#models_to_create.append(SourceArticleToCategory)
 
 #class Content(BaseModel):
 #    '''Part of text, scraped from bigger article'''
@@ -33,10 +58,11 @@ from peewee import *
 #    def save(self, *args, **kwargs):
 #        self.text_length = len(self.text)
 #        return super(Blog, self).save(*args, **kwargs)
-#tables_to_create.append(Content)
+#models_to_create.append(Content)
 
 
 def initiate_db():
     '''Connects to specified in configuration database and create tables if necessary'''
+    models_to_create.append(*digger_models)
     db.connect()
-    db.create_tables(tables_to_create, True)
+    db.create_tables(models_to_create, True)

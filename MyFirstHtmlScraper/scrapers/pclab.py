@@ -1,21 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
-import requests
 import logging
-import bs4
 import multiprocessing
 import re
-import sys
-import os
-sys.path.append('../orm/')
-sys.path.append('.')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
-from app.models import Post, Category
+from models.shared import Category #, SourceArticle, SourceArticleToCategory, Content
 from dateutil.parser import parse
-from global_functions import get_urls_from_pattern, get_soup_for_url
+from common.helpers import get_urls_from_pattern, get_soup_for_url
+from configuration.settings import PCLAB_SITE_PATTERN, PCLAB_ARTICLE_PATTERN
 
-
-PCLAB_SITE_PATTERN =  'http://pclab.pl/news-{{site_number}}-100.html' #{{site_number}} is taken from last site number
-PCLAB_ARTICLE_PATTERN = 'http://pclab.pl/news{{article_id}}.html'
 
 def start_scraping():
     first_site = get_urls_from_pattern(1, PCLAB_SITE_PATTERN)[0]
