@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
+import bs4
+import requests
 
 def get_key_words_from_text(input_string, no_of_key_words):
     ''' Returns most common words from passed string'''

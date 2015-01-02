@@ -40,13 +40,26 @@ class Content(models.Model):
     text = models.TextField()
     text_length = models.IntegerField(default=0)
     category = models.ManyToManyField(Category)
-    use_count = models.IntegerField(default=0) # how many times this text was publicated on web
+    use_count = models.IntegerField(default=0) # how many times this text was already publicated on web
     source = models.IntegerField(default=0, choices=SOURCE_CHOICE)
     source_id = models.IntegerField(null=True)
 
     def save(self, *args, **kwargs):
         self.text_length = len(self.text)
         super(ModelClass, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        app_label = 'app'
+
+class SourceArticle(models.Model):
+    '''Article to extract content'''
+    text = models.TextField()
+    category = models.ManyToManyField(Category)
+    is_extracted = models.BooleanField(default=False)
+    source = models.IntegerField(default=0, choices=SOURCE_CHOICE)
 
     def __str__(self):
         return self.title

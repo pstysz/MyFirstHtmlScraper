@@ -51,7 +51,11 @@ def scrap_site(url):
 def get_art_urls_from_list(url_list):
     '''returns urls to articles from passed url to list of articles'''
     articles_urls = []
+    existing_ids = Post.objects.only('id')
     for url in url_list:
         soup = get_soup_for_url(url)
-
+        ids = [int(re.findall(r'\d+', a.attrs.get('href'))[0]) for a in soup.select('div.list div.element div.title a')]
+        existing_ids.append(*ids)
+        debug = existing_ids
+        #TODO: Filter urls by existing ids, add only new
     return articles_urls
