@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+SOURCE_CHOICE = (
+    (0, 'Unknown'),
+    (1, 'PcLab'),
+)
+
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     popularity = models.IntegerField(default=0) # how often category appears in posts
@@ -36,6 +41,8 @@ class Content(models.Model):
     text_length = models.IntegerField(default=0)
     category = models.ManyToManyField(Category)
     use_count = models.IntegerField(default=0) # how many times this text was publicated on web
+    source = models.IntegerField(default=0, choices=SOURCE_CHOICE)
+    source_id = models.IntegerField(null=True)
 
     def save(self, *args, **kwargs):
         self.text_length = len(self.text)

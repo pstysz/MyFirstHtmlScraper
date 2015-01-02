@@ -11,7 +11,7 @@ sys.path.append('.')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "orm.settings")
 from app.models import Post, Category
 from dateutil.parser import parse
-from global_functions import get_urls_from_pattern
+from global_functions import get_urls_from_pattern, get_soup_for_url
 
 ROOT_URL = 'http://www.wykop.pl/wykopalisko/'
 SITE_PATTERN = ROOT_URL + 'strona/{{site_number}}/' #{{site_number}} is taken from last site number
@@ -25,17 +25,6 @@ def start_scraping_digger():
     pool.map_async(scrap_site, urls)
     pool.close()
     pool.join()
-
-def get_soup_for_url(url):
-    try:
-        logging.info('Getting response for {0}'.format(url))
-        response = requests.get(url)
-        logging.info('Generating soup for {0}'.format(url))
-        soup = bs4.BeautifulSoup(response.text, "lxml")
-        return soup
-    except requests.exceptions.RequestException as e: 
-        print(e)
-        sys.exit(1)
 
 def get_last_site_number(soup):
     try:

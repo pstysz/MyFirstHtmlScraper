@@ -17,3 +17,14 @@ def get_key_words_from_text(input_string, no_of_key_words):
 
 def get_urls_from_pattern(no_of_sites, site_pattern):
     return [site_pattern.replace('{{site_number}}', str(site_number)) for site_number in range(1, no_of_sites + 1)]
+
+def get_soup_for_url(url):
+    try:
+        logging.info('Getting response for {0}'.format(url))
+        response = requests.get(url)
+        logging.info('Generating soup for {0}'.format(url))
+        soup = bs4.BeautifulSoup(response.text, "lxml")
+        return soup
+    except requests.exceptions.RequestException as e: 
+        print(e)
+        sys.exit(1)
