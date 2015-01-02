@@ -65,7 +65,6 @@
     <Folder Include="app\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app\db.sqlite3" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <PropertyGroup>
