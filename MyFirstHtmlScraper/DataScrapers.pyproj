@@ -6,7 +6,7 @@
     <ProjectGuid>c8f4b8d9-c248-4e65-bbd8-aa664dc26c52</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>app\main.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,54 +25,42 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app\configuration.py">
+    <Compile Include="configuration\settings.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\migrations\0004_auto_20150101_1948.py" />
-    <Compile Include="app\migrations\0005_auto_20150101_2217.py" />
-    <Compile Include="app\migrations\0006_auto_20150102_0920.py" />
-    <Compile Include="app\migrations\0007_sourcearticle.py" />
-    <Compile Include="app\pclab_functions.py">
+    <Compile Include="models\shared.py" />
+    <Compile Include="models\__init__.py" />
+    <Compile Include="scrapers\pclab.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\global_functions.py">
+    <Compile Include="common\helpers.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\migrations\0001_initial.py" />
-    <Compile Include="app\migrations\0002_category_popularity.py" />
-    <Compile Include="app\migrations\0003_auto_20150101_1922.py" />
-    <Compile Include="app\migrations\__init__.py" />
-    <Compile Include="app\models.py">
+    <Compile Include="models\digger.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\peewee_models.py">
+    <Compile Include="tests\test.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\test.py">
+    <Compile Include="configuration\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="app\__init__.py">
+    <Compile Include="scrapers\digger.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="orm\manage.py" />
-    <Compile Include="orm\settings.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="orm\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="app\digger_functions.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="app\main.py" />
+    <Compile Include="main.py" />
+    <Compile Include="scrapers\__init__.py" />
+    <Compile Include="tests\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\3.4" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="app\migrations\" />
-    <Folder Include="orm\" />
-    <Folder Include="app\" />
+    <Folder Include="configuration\" />
+    <Folder Include="models\" />
+    <Folder Include="common\" />
+    <Folder Include="tests\" />
+    <Folder Include="scrapers\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />

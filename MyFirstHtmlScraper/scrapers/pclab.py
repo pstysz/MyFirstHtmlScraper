@@ -14,14 +14,14 @@ from dateutil.parser import parse
 from global_functions import get_urls_from_pattern, get_soup_for_url
 
 
-SITE_PATTERN =  'http://pclab.pl/news-{{site_number}}-100.html' #{{site_number}} is taken from last site number
-ARTICLE_PATTERN = 'http://pclab.pl/news{{article_id}}.html'
+PCLAB_SITE_PATTERN =  'http://pclab.pl/news-{{site_number}}-100.html' #{{site_number}} is taken from last site number
+PCLAB_ARTICLE_PATTERN = 'http://pclab.pl/news{{article_id}}.html'
 
-def start_scraping_pclab():
-    first_site = get_urls_from_pattern(1, SITE_PATTERN)[0]
+def start_scraping():
+    first_site = get_urls_from_pattern(1, PCLAB_SITE_PATTERN)[0]
     base_soup = get_soup_for_url(first_site)
     no_of_sites = get_last_site_number(base_soup)
-    url_list = get_urls_from_pattern(no_of_sites, SITE_PATTERN)
+    url_list = get_urls_from_pattern(no_of_sites, PCLAB_SITE_PATTERN)
     articles_urls =  get_art_urls_from_list(url_list)
     no_of_pools = multiprocessing.cpu_count() * 2
     pool = multiprocessing.Pool(no_of_pools)
