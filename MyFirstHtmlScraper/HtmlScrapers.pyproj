@@ -29,6 +29,9 @@
     <Compile Include="configuration\settings.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\orm.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="models\shared.py" />
     <Compile Include="models\__init__.py" />
     <Compile Include="scrapers\pclab.py">

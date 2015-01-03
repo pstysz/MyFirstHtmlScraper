@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
 import multiprocessing
+from models.shared import Category
 from models.digger import KickerPost, KickerPostToCategory
-from models.shared import Category, db
 from dateutil.parser import parse
 from common.helpers import get_urls_from_pattern, get_soup_for_url
-from configuration.settings import KICKER_ROOT_URL, KICKER_SUBSITE_PATTERN
+from configuration.settings import KICKER_ROOT_URL, KICKER_SUBSITE_PATTERN, DB_HANDLER
 
 def start_scraping():
     base_soup = get_soup_for_url(KICKER_ROOT_URL)
@@ -74,7 +74,7 @@ def create_posts_from_soup(soup):
                     kickerpost_to_category.append({'post': post.id, 'category': new_category.id})
                 if len(kickerpost_to_category) > 0:
                     # bulk insert many-to-many relation between created post and categories
-                    with db.transaction():
+                    with DB_HANDLER.transaction():
                         KickerPostToCategory.insert_many(kickerpost_to_category).execute()
     except:  
         #TODO: Implement some nice exception handling
