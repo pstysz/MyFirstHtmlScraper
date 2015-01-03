@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import multiprocessing
+from datetime import datetime
 from models.shared import Category
 from models.digger import KickerPost, KickerPostToCategory
 from dateutil.parser import parse
@@ -31,6 +32,7 @@ def create_posts_from_soup(soup):
     try:
         #gets links for all subsites in soup
         logging.info('Getting posts from soup')
+        kickerpost_to_category = []  # holds data for many-to-many table to bulk update at the end
         for article in soup.select('ul#itemsStream div.article'):
             temp_desc = article.select('div.lcontrast div.description p a')[0].get_text().strip()
             if len(temp_desc) < 100:
@@ -58,24 +60,24 @@ def create_posts_from_soup(soup):
                 post.image_url = article.select('div.media-content img')[0].attrs.get('data-original')
                 if post.image_url is None:
                     post.image_url = article.select('div.media-content img')[0].attrs.get('src')
-                post.date = parse(article.select('div.lcontrast div.row span.affect time')[0].attrs.get('datetime'))
+                unparsed_date = article.select('div.lcontrast div.row span.affect time')[0].attrs.get('datetime')
+                post.date = parse(unparsed_date, ignoretz=True)
                 post.save()
 
                 tags = [a.attrs.get('href').split('/')[-2] for a in article.select('a.tag') if not a.attrs.get('href') is None]
-                kickerpost_to_category = []  # holds data for many-to-many table
                 for tag in tags:
                     new_category = None
                     try:
                         new_category = Category.get(Category.name == tag)
                         new_category.popularity_kicker += 1
-                        new_category.save() # TODO: Test it with bulk insert         
+                        new_category.save()      
                     except:
                         new_category = Category.create(name=tag, popularity_kicker=1) 
                     kickerpost_to_category.append({'post': post.id, 'category': new_category.id})
-                if len(kickerpost_to_category) > 0:
-                    # bulk insert many-to-many relation between created post and categories
-                    with DB_HANDLER.transaction():
-                        KickerPostToCategory.insert_many(kickerpost_to_category).execute()
+        with DB_HANDLER.transaction():
+            for idx in range(0, len(kickerpost_to_category), 1000): # bulk insert in 1000 pcs chunks
+                KickerPostToCategory.insert_many(kickerpost_to_category[idx:idx+1000]).execute()
+
     except:  
         #TODO: Implement some nice exception handling
         raise 
