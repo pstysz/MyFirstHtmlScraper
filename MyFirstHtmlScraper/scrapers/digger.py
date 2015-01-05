@@ -21,17 +21,17 @@ def start_scraping():
 def get_last_site_number(soup):
     try:
         #gets last site number from footer
-        logging.debug('Digger gets last site number')
+        logging.info('Digger gets last site number')
         page_number = soup.select('div.pager > p > a')[-2].get_text()
         return int(page_number)
-    except:  
-        #TODO: Implement some nice exception handling
+    except Exception as e:  
+        logging.exception(e)
         raise 
 
 def create_posts_from_soup(soup):
     try:
         #gets links for all subsites in soup
-        logging.debug('Digger gets posts from soup')
+        logging.info('Digger gets posts from soup')
         kickerpost_to_category = []  # holds data for many-to-many table to bulk update at the end
         for article in soup.select('ul#itemsStream div.article'):
             temp_desc = article.select('div.lcontrast div.description p a')[0].get_text().strip()
@@ -73,21 +73,20 @@ def create_posts_from_soup(soup):
                     except:
                         raise
                     kickerpost_to_category.append({'post': post.id, 'category': new_category.id})
-            except:
-                raise
+            except Exception as e:  
+                logging.exception(e)
         with DB_HANDLER.transaction():
             for idx in range(0, len(kickerpost_to_category), 1000): # bulk insert in 1000 pcs chunks
                 KickerPostToCategory.insert_many(kickerpost_to_category[idx:idx+1000]).execute()
-
-    except:  
-        #TODO: Implement some nice exception handling
-        raise 
+    except Exception as e:  
+        logging.exception(e)
+        raise
 
 def scrap_site(url):
-    logging.debug('Digger starts scapring {0}'.format(url))
+    logging.info('Digger starts scapring {0}'.format(url))
     try:
         soup = get_soup_for_url(url)
         create_posts_from_soup(soup)
-    except:
-        #TODO: Implement some nice exception handling
+    except Exception as e:  
+        logging.exception(e)
         raise

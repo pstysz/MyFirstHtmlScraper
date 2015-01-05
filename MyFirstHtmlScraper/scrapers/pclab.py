@@ -26,18 +26,18 @@ def start_scraping():
     pool.join()
 
 def get_last_site_number(soup):
-    logging.debug('Pclab gets last site number')
+    logging.info('Pclab gets last site number')
     try:
         page_number = soup.select('div.pages div.offset a')[-2].get_text()
         return int(page_number)
-    except:  
-        #TODO: Implement some nice exception handling
-        raise 
+    except Exception as e:  
+        logging.exception(e)
+        raise
 
 def get_art_urls_from_news_list(news_list_url):
     '''Returns urls to articles from passed url to list of articles.
        Result is list of urls to new, unique articles (not added to db yet)'''
-    logging.debug('Pclab gets arts urls from passed news list')
+    logging.info('Pclab gets arts urls from passed news list')
     articles_urls = []
     soup = get_soup_for_url(news_list_url)
     ids = [int(re.findall(r'\d+', a.attrs.get('href'))[0]) for a in soup.select('div.list div.element div.title a')]
@@ -69,7 +69,8 @@ def create_article_from_url(article_url):
                 new_category.save()      
             except Category.DoesNotExist:
                 new_category = Category.create(name=tag, popularity_pclab=1) 
-            except:
+            except Exception as e:  
+                logging.exception(e)
                 raise
             sourcearticle_to_category.append({'source_article': article.id, 'category': new_category.id})
         with DB_HANDLER.transaction():
