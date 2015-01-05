@@ -76,6 +76,8 @@ def create_posts_from_soup(soup):
                     except:
                         raise
                     kickerpost_to_category.append({'post': post.id, 'category': new_category.id})
+            except:
+                raise
         with DB_HANDLER.transaction():
             for idx in range(0, len(kickerpost_to_category), 1000): # bulk insert in 1000 pcs chunks
                 KickerPostToCategory.insert_many(kickerpost_to_category[idx:idx+1000]).execute()
