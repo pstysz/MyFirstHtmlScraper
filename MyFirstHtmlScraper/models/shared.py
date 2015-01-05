@@ -7,7 +7,8 @@ SOURCE_TYPE = {
     'pclab': 1,
     'pcworld': 2,
     'komputerswiat': 3,
-    'di': 4 #http://di.com.pl/
+    'di': 4, #http://di.com.pl/ 
+    'frazpc': 5
 }
 
 CATEGORY_GROUP = {
