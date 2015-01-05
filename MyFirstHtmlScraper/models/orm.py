@@ -22,10 +22,10 @@ models_to_create.append(CreatedArticleToCategory)
 
 def __populate_db():
     '''Populate database with prepared data after create new tables'''
-    logging.debug('Populating data')
+    logging.info('Populating data')
     # Populate category_group table
     if not CategoryGroup.select().exists():
-        logging.debug('Creating CategoryGroup data')
+        logging.info('Creating CategoryGroup data')
         data_to_bulkinsert = []
         for key, elem in CATEGORY_GROUP.items():
             data_to_bulkinsert.append({'id': elem, 'name': key})
@@ -35,7 +35,7 @@ def __populate_db():
 
 def initiate_db():
     '''Connects to specified in configuration database and create tables if necessary'''
-    logging.debug('Initiating database')
+    logging.info('Initiating database')
     DB_HANDLER.connect()
     DB_HANDLER.create_tables(models_to_create, True)
     __populate_db()
