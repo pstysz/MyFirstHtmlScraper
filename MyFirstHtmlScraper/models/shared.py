@@ -4,7 +4,10 @@ from configuration.settings import DB_HANDLER
 
 SOURCE_TYPE = {
     'unknown': 0,
-    'pclab': 1
+    'pclab': 1,
+    'pcworld': 2,
+    'komputerswiat': 3,
+    'di': 4 #http://di.com.pl/
 }
 
 CATEGORY_GROUP = {
