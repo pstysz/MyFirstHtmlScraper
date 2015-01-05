@@ -43,6 +43,7 @@ def get_tag_from_string(input_string):
     return unidecode(alphanum_str.lower())
 
 def remove_html_from_string(input_string):
+    '''Removes all html tags from input string and returns modified string'''
     return re.sub('<[^<]+?>', '', input_string)
 
 
@@ -67,4 +68,6 @@ def get_content_from_article(source_type, source_id):
     return False
 
 def get_article_from_content():
+    '''Creates single article from prepared content on db'''
+    #TODO: Implementation
     pass
