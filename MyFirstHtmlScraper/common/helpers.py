@@ -4,7 +4,7 @@ import bs4
 import requests
 import re
 from unidecode import unidecode
-from models.shared import SOURCE_TYPE
+from models.shared import SOURCE_TYPE, SourceArticle, Content
 
 def get_key_words_from_text(input_string, no_of_key_words):
     ''' Returns most common words from passed string'''
@@ -46,17 +46,25 @@ def remove_html_from_string(input_string):
     return re.sub('<[^<]+?>', '', input_string)
 
 
-def get_content_from_article(source, source_id):
+def get_content_from_article(source_type, source_id):
     '''Extract and save to db content from article.
        Returns True for success and False if fail'''
-    if source == SOURCE_TYPE['unknown']:
-        pass
-    elif source == SOURCE_TYPE['pclab']:
-        pass
+    source_art = SourceArticle.get((SourceArticle.source_type == source_type) & (SourceArticle.source_id == source_id))  
+    if source_type == SOURCE_TYPE['pclab'] and not source_art.is_extracted:
+        splitted_art = re.split(r'[\.?!]', source_art.text)
+        while len(splitted_art) > 0:
+            content = ''
+            while len(content) < 400 and len(splitted_art) > 0:
+                if content != '':
+                    content = '. '.join((content, splitted_art.pop(0).strip()))
+                else:
+                    content = splitted_art.pop(0)
+            if len(content) > 200:
+                new_content = Content.create(text=content, text_length=len(content), article=source_art.id)
+        source_art.is_extracted = True
+        source_art.save()
+        return True
     return False
 
-def create_content():
-    '''Scan db for unextracted articles and create content from them'''
-    #TODO: Call get_content_from_article here
+def get_article_from_content():
     pass
-
