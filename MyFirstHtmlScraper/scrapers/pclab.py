@@ -13,6 +13,8 @@ def start_scraping():
     base_soup = get_soup_for_url(first_site)
     no_of_sites = get_last_site_number(base_soup)
     url_list = get_urls_from_pattern(no_of_sites, PCLAB_SITE_PATTERN)
+
+    # debug
     existing_ids = SourceArticle.select(SourceArticle.source_id).where(SourceArticle.source_type == SOURCE_TYPE['pclab'])
     test_id = 61250
     test_val = test_id in existing_ids
