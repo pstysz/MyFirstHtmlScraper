@@ -26,6 +26,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common\__init__.py" />
+    <Compile Include="configuration\settings.py" />
     <Compile Include="models\orm.py">
       <SubType>Code</SubType>
     </Compile>
