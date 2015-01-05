@@ -36,7 +36,7 @@ class Category(BaseModel):
     popularity_kicker = IntegerField(default=0)  # how often category appears on kicker site
     popularity_pclab = IntegerField(default=0)  # how often category appears on pclab site
     is_disabled = BooleanField(default=False)
-    category_group = ForeignKeyField(CategoryGroup)
+    category_group = ForeignKeyField(CategoryGroup, default=0)
     def __str__(self):
         return 'Category id={0}'.format(self.id)
 
