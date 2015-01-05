@@ -59,6 +59,7 @@ def create_article_from_url(article_url):
             paragraphs.remove('')
         text = ' '.join(paragraphs)
         article = SourceArticle.create(text=text, source_type=SOURCE_TYPE['pclab'], source_id=article_id)
+        #TODO: add protection when there is no tag!!
         tags = [get_tag_from_string(a.get_text()) for a in soup.select('div.main div.substance div.tags a')]
         sourcearticle_to_category = []
         for tag in tags:
