@@ -71,8 +71,10 @@ def create_posts_from_soup(soup):
                         new_category = Category.get(Category.name == tag)
                         new_category.popularity_kicker += 1
                         new_category.save()      
-                    except:
+                    except Category.DoesNotExist:
                         new_category = Category.create(name=tag, popularity_kicker=1) 
+                    except:
+                        raise
                     kickerpost_to_category.append({'post': post.id, 'category': new_category.id})
         with DB_HANDLER.transaction():
             for idx in range(0, len(kickerpost_to_category), 1000): # bulk insert in 1000 pcs chunks

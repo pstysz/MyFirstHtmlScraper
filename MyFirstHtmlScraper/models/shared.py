@@ -2,10 +2,10 @@
 from peewee import *
 from configuration.settings import DB_HANDLER
 
-SOURCE_CHOICE = (
-    (0, 'unknown'),
-    (1, 'pclab'),
-)
+SOURCE_TYPE = {
+    'unknown': 0,
+    'pclab': 1
+}
 
 class BaseModel(Model):
     '''Abstract class used to set parameters for every model'''
@@ -25,12 +25,12 @@ class SourceArticle(BaseModel):
     '''Article to extract content'''
     text = TextField()
     is_extracted = BooleanField(default=False)  # is content already extracted from article
-    source = IntegerField(default=0, choices=SOURCE_CHOICE)
+    source_type = IntegerField(default=0)  # value from SOURCE_TYPE dictionary
     source_id = IntegerField(default=0)
     def __str__(self):
         return 'SourceArticle id={0}'.format(self.id)
     class Meta:
-        indexes = ((('source', 'source_id'), True),)
+        indexes = ((('source_type', 'source_id'), True),)
         db_table = 'source_article'
 
 class SourceArticleToCategory(BaseModel):

@@ -8,12 +8,6 @@ from peewee import *
 
 APP_DIR = os.path.dirname(os.path.dirname(__file__))
 
-#sys.path.append(os.path.join(APP_DIR, 'common'))
-#sys.path.append(os.path.join(APP_DIR, 'configuration'))
-#sys.path.append(os.path.join(APP_DIR, 'models'))
-#sys.path.append(os.path.join(APP_DIR, 'scrapers'))
-#sys.path.append(os.path.join(APP_DIR, 'tests'))
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 DBSETTINGS = {
