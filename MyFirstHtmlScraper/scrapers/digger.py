@@ -21,7 +21,7 @@ def start_scraping():
 def get_last_site_number(soup):
     try:
         #gets last site number from footer
-        logging.info('Getting last site number')
+        logging.debug('Digger gets last site number')
         page_number = soup.select('div.pager > p > a')[-2].get_text()
         return int(page_number)
     except:  
@@ -31,14 +31,13 @@ def get_last_site_number(soup):
 def create_posts_from_soup(soup):
     try:
         #gets links for all subsites in soup
-        logging.info('Getting posts from soup')
+        logging.debug('Digger gets posts from soup')
         kickerpost_to_category = []  # holds data for many-to-many table to bulk update at the end
         for article in soup.select('ul#itemsStream div.article'):
             temp_desc = article.select('div.lcontrast div.description p a')[0].get_text().strip()
             if len(temp_desc) < 100:
                 continue #get only posts with text longer than 100 chars
             temp_id = article.attrs.get('data-id')
-            logging.info('Getting post id = {0}'.format(temp_id))
             temp_popularity = article.select('div.diggbox span')[0].get_text().strip()
             if (not temp_popularity.isdigit()) or (temp_id is None):
                 continue #popularity is not number for ad posts
@@ -49,11 +48,9 @@ def create_posts_from_soup(soup):
                 post = KickerPost.get(KickerPost.id == temp_id)           
                 if post.popularity != temp_popularity:
                     post.popularity = temp_popularity
-                    logging.info('Updating post id = {0}'.format(temp_id))
                     post.save()
             except KickerPost.DoesNotExist as e:
                 #post with selected id doesnt exist yet == create new post
-                logging.info('Creating post id = {0}'.format(temp_id))
                 post = KickerPost.create(id=temp_id, description=temp_desc, popularity=temp_popularity)
                 post.title = article.select('div.lcontrast h2 a')[0].get_text().strip()
                 post.url = article.select('div.lcontrast h2 a')[0].attrs.get('href').strip()
@@ -87,8 +84,8 @@ def create_posts_from_soup(soup):
         raise 
 
 def scrap_site(url):
+    logging.debug('Digger starts scapring {0}'.format(url))
     try:
-        logging.info('Start scapring {0}'.format(url))
         soup = get_soup_for_url(url)
         create_posts_from_soup(soup)
     except:
