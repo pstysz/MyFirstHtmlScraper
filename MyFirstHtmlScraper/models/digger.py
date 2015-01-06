@@ -11,7 +11,7 @@ class KickerPost(BaseModel):
     popularity = IntegerField(default=0)  # count of 'wykopy'
     image_url = CharField(null=True)
     date = DateTimeField(null=True)
-    use_count = IntegerField(default=0)  # how many times post was already publicated on web
+    use_count = IntegerField(default=0)  # how many times post was already published on web
     def __str__(self):
         return 'KickerPost id={0}'.format(self.id)
     class Meta:

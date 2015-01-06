@@ -3,6 +3,7 @@ import logging
 import bs4
 import requests
 import re
+
 from unidecode import unidecode
 from models.shared import SOURCE_TYPE, SourceArticle, Content
 
@@ -31,8 +32,8 @@ def get_soup_for_url(url):
         soup = bs4.BeautifulSoup(response.text, "lxml")
         return soup
     except requests.exceptions.RequestException as e: 
-        print(e)
-        sys.exit(1)
+        logging.exception('Exception {0} on {0}'.format(e.strerror, url))
+        raise
 
 def get_tag_from_string(input_string):
     '''Creates tag from input string, that means:
@@ -52,7 +53,7 @@ def get_content_from_article(source_type, source_id):
        Returns True for success and False if fail'''
     source_art = SourceArticle.get((SourceArticle.source_type == source_type) & (SourceArticle.source_id == source_id))  
     if source_type == SOURCE_TYPE['pclab'] and not source_art.is_extracted:
-        splitted_art = re.split(r'[\.?!]', source_art.text)
+        splitted_art = re.split(r'[\.?!\n]', source_art.text)
         while len(splitted_art) > 0:
             content = ''
             while len(content) < 400 and len(splitted_art) > 0:
@@ -70,4 +71,8 @@ def get_content_from_article(source_type, source_id):
 def get_article_from_content():
     '''Creates single article from prepared content on db'''
     #TODO: Implementation
-    pass
+    return False
+
+def clear_articles():
+    '''Removes from db incorrect articles'''
+    return False

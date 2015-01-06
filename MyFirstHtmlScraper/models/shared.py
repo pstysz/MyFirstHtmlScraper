@@ -69,8 +69,8 @@ class SourceArticleToCategory(BaseModel):
 class Content(BaseModel):
     '''Part of text, scraped from bigger article'''
     text = TextField()
-    text_length = IntegerField(default=0)  # strored on db to avoid calling len() before getting text value each time
-    use_count = IntegerField(default=0)  # how many times this text was already publicated on web
+    text_length = IntegerField(default=0)  # stored on db to avoid calling len() before getting text value each time
+    use_count = IntegerField(default=0)  # how many times this text was already published on web
     article = ForeignKeyField(SourceArticle)
     def __str__(self):
         return 'Content id={0}'.format(self.id)

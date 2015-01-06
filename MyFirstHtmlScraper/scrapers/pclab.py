@@ -16,14 +16,19 @@ def start_scraping():
     no_of_pools = multiprocessing.cpu_count() * 2
 
     pool = multiprocessing.Pool(no_of_pools)  
-    articles_urls_list = pool.map(get_art_urls_from_news_list, url_list)
+    map_result = pool.map_async(get_art_urls_from_news_list, url_list)
     pool.close()
     pool.join()
+    packed_url_list = map_result.get()
+    articles_urls_list = [item for sublist in packed_url_list for item in sublist]
 
-    #pool = multiprocessing.Pool(no_of_pools)
-    pool.map_async(create_article_from_url, articles_urls_list)
-    pool.close()
-    pool.join()
+    debug = len(articles_urls_list)
+
+    if len(articles_urls_list) > 0:
+        pool = multiprocessing.Pool(no_of_pools)
+        pool.map_async(create_article_from_url, articles_urls_list)
+        pool.close()
+        pool.join()
 
 def get_last_site_number(soup):
     logging.info('Pclab gets last site number')
@@ -57,10 +62,16 @@ def create_article_from_url(article_url):
         paragraphs = [remove_html_from_string(p.get_text()) for p in soup.select('div.main div.substance div.data p')]
         while '' in paragraphs:
             paragraphs.remove('')
-        text = ' '.join(paragraphs)
+        text = ' '.join(paragraphs).strip()
+        if len(text) == 0:
+            logging.info('Article from {0} is too short'.format(article_url))
+            return False
         article = SourceArticle.create(text=text, source_type=SOURCE_TYPE['pclab'], source_id=article_id)
-        #TODO: add protection when there is no tag!!
-        tags = [get_tag_from_string(a.get_text()) for a in soup.select('div.main div.substance div.tags a')]
+        tags_list = soup.select('div.main div.substance div.tags a')
+        if tags_list == None:
+            logging.info('There is no tags for article {0}'.format(article_url))
+            return False
+        tags = [get_tag_from_string(a.get_text()) for a in tags_list]
         sourcearticle_to_category = []
         for tag in tags:
             new_category = None

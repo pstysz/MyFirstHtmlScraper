@@ -50,7 +50,7 @@ def create_posts_from_soup(soup):
                     post.popularity = temp_popularity
                     post.save()
             except KickerPost.DoesNotExist as e:
-                #post with selected id doesnt exist yet == create new post
+                #post with selected id doesn't exist yet == create new post
                 post = KickerPost.create(id=temp_id, description=temp_desc, popularity=temp_popularity)
                 post.title = article.select('div.lcontrast h2 a')[0].get_text().strip()
                 post.url = article.select('div.lcontrast h2 a')[0].attrs.get('href').strip()
