@@ -9,6 +9,10 @@ from configuration.settings import PCLAB_SITE_PATTERN, PCLAB_ARTICLE_PATTERN, DB
 
 
 def start_scraping():
+    #TODO:
+    # 1. Add constant to store max number of pages to scrap in one run
+    # 2. Save unscraped arts in new table eg. ArticlesToRescrap
+    # 3. Add shuffle sentences after generate new article
     first_site = get_urls_from_pattern(1, PCLAB_SITE_PATTERN)[0]
     base_soup = get_soup_for_url(first_site)
     no_of_sites = get_last_site_number(base_soup)
